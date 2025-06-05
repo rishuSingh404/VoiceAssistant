@@ -1,0 +1,32 @@
+{
+  "passage_001": {
+    "1": "Psychologists debate if theoretical reading models apply in real classrooms; strategies like summarizing help retention more than drills.",
+    "2": "Teachers stick to rote memorization because they lack time and training for evidence-based comprehension strategies.",
+    "3": "Students decode words but don’t grasp deeper meaning—for example, pronouncing 'photosynthesis' without understanding it, undermining critical thinking.",
+    "4": "Reading workshops with discussions and concept maps show better comprehension outcomes than drills alone."
+  },
+  "passage_002": {
+    "1": "Retailers invest in omnichannel tech because consumers expect seamless transitions between online and in-store experiences.",
+    "2": "Local stores struggle with e-commerce due to limited technical expertise, infrastructure, and budget constraints.",
+    "3": "Customers demand hyper-personalized experiences via AI-driven recommendations, dynamic pricing, and targeted promotions.",
+    "4": "AI/ML innovations like cashier-less checkout and AR fitting rooms will reshape retail and those who fail to adapt will lose market share."
+  },
+  "passage_003": {
+    "1": "Climate change threatens food security through rising temperatures, shifting rainfall, and extreme weather, disrupting farming cycles.",
+    "2": "Sustainable agriculture practices—like crop rotation and precision irrigation—improve resilience, but smallholder farmers often lack resources to adopt them.",
+    "3": "Government policies and international cooperation, such as subsidies for green tech and carbon credits, are crucial to scale sustainability.",
+    "4": "Consumers can support sustainability by reducing food waste and choosing local, seasonal produce, strengthening the overall food system."
+  },
+  "passage_004": {
+    "1": "Economic inequality widens as globalization and technology concentrate wealth among a few while worker wages stagnate.",
+    "2": "Nordic countries use progressive taxes and social safety nets to reduce inequality without harming growth.",
+    "3": "Emerging economies face challenges—limited tax bases and political instability—making redistributive policies harder to implement.",
+    "4": "Global coordination, such as tax transparency and IMF support, is needed to fund welfare programs and empower marginalized communities."
+  },
+  "passage_005": {
+    "1": "Cultural heritage is at risk as younger generations migrate away, and traditions fade in isolated communities.",
+    "2": "VR and 3D scanning help digitize artifacts and rituals, allowing future access to cultural heritage even if physical items degrade.",
+    "3": "Digital archiving raises concerns over who owns and controls sacred or sensitive knowledge, prompting community-driven permission platforms.",
+    "4": "Integrating digital storytelling in education fosters intergenerational knowledge transfer, balancing accessibility and cultural autonomy."
+  }
+}

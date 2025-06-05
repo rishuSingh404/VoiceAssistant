@@ -1,0 +1,226 @@
+{
+  "passage_001": [
+    {
+      "id": "P1Q1",
+      "text": "According to Paragraph 2, why do many teachers continue to focus on rote memorization?",
+      "type": "detail",
+      "gold_paragraph_id": 2,
+      "gold_answer": "Because teachers often lack the time or training to implement evidence-based strategies."
+    },
+    {
+      "id": "P1Q2",
+      "text": "The word 'consequently' in Paragraph 3 signals:",
+      "type": "vocab",
+      "gold_paragraph_id": 3,
+      "gold_vocab_definition": "As a result; indicating a logical consequence."
+    },
+    {
+      "id": "P1Q3",
+      "text": "Which paragraph outlines the pilot programs introduced to improve comprehension?",
+      "type": "detail",
+      "gold_paragraph_id": 4,
+      "gold_answer": "Paragraph 4."
+    },
+    {
+      "id": "P1Q4",
+      "text": "Which of the following scenarios best illustrates the author’s implied stance on comprehension strategies?",
+      "type": "inference",
+      "gold_paragraph_id": 1,
+      "gold_inference_answer": "A classroom using summarizing, questioning, and predicting to boost long-term retention."
+    },
+    {
+      "id": "P1Q5",
+      "text": "What does the author imply about students who only master decoding words (Paragraph 3)?",
+      "type": "inference",
+      "gold_paragraph_id": 3,
+      "gold_inference_answer": "They can pronounce words but fail to understand deeper meanings, undermining critical thinking."
+    },
+    {
+      "id": "P1Q6",
+      "text": "The phrase 'evidence-based strategies' in Paragraph 2 most nearly means:",
+      "type": "vocab",
+      "gold_paragraph_id": 2,
+      "gold_vocab_definition": "Teaching methods supported by empirical research and data."
+    }
+  ],
+
+  "passage_002": [
+    {
+      "id": "P2Q1",
+      "text": "According to Paragraph 1, why have retailers invested heavily in point-of-sale systems and CRM tools?",
+      "type": "detail",
+      "gold_paragraph_id": 1,
+      "gold_answer": "Because consumers expect seamless omnichannel experiences between mobile, web, and physical stores."
+    },
+    {
+      "id": "P2Q2",
+      "text": "The word 'consequently' in Paragraph 3 indicates:",
+      "type": "vocab",
+      "gold_paragraph_id": 3,
+      "gold_vocab_definition": "As a result; indicating a cause-and-effect relationship."
+    },
+    {
+      "id": "P2Q3",
+      "text": "Which paragraph discusses the challenges faced by local stores adopting e-commerce?",
+      "type": "detail",
+      "gold_paragraph_id": 2,
+      "gold_answer": "Paragraph 2."
+    },
+    {
+      "id": "P2Q4",
+      "text": "Based on the author’s predictions in Paragraph 4, which innovation is most likely to become widespread?",
+      "type": "inference",
+      "gold_paragraph_id": 4,
+      "gold_inference_answer": "Voice-activated shopping assistants and cashier-less checkout systems."
+    },
+    {
+      "id": "P2Q5",
+      "text": "What does the author imply about small retailers that do not adopt digital transformation (Paragraph 2)?",
+      "type": "inference",
+      "gold_paragraph_id": 2,
+      "gold_inference_answer": "They will struggle with real-time inventory tracking and personalized marketing."
+    },
+    {
+      "id": "P2Q6",
+      "text": "The term 'hyper-personalized' in Paragraph 3 most nearly means:",
+      "type": "vocab",
+      "gold_paragraph_id": 3,
+      "gold_vocab_definition": "Highly customized to individual consumer preferences."
+    }
+  ],
+
+  "passage_003": [
+    {
+      "id": "P3Q1",
+      "text": "According to Paragraph 1, what is a primary threat to global food security?",
+      "type": "detail",
+      "gold_paragraph_id": 1,
+      "gold_answer": "Rising temperatures, shifting rainfall patterns, and extreme weather events."
+    },
+    {
+      "id": "P3Q2",
+      "text": "The word 'sequester' in Paragraph 2 means:",
+      "type": "vocab",
+      "gold_paragraph_id": 2,
+      "gold_vocab_definition": "To capture and store (carbon) in order to reduce greenhouse gases."
+    },
+    {
+      "id": "P3Q3",
+      "text": "Which paragraph emphasizes the role of government policy in scaling sustainable agriculture?",
+      "type": "detail",
+      "gold_paragraph_id": 3,
+      "gold_answer": "Paragraph 3."
+    },
+    {
+      "id": "P3Q4",
+      "text": "Which real-world policy would align with the author’s suggestions in Paragraph 3?",
+      "type": "inference",
+      "gold_paragraph_id": 3,
+      "gold_inference_answer": "Subsidies for green technologies and research into climate-smart crops."
+    },
+    {
+      "id": "P3Q5",
+      "text": "What challenge does Paragraph 2 indicate smallholder farmers face when adopting sustainable techniques?",
+      "type": "detail",
+      "gold_paragraph_id": 2,
+      "gold_answer": "They lack the resources or knowledge to implement sustainable practices effectively."
+    },
+    {
+      "id": "P3Q6",
+      "text": "Which paragraph urges consumer behavior changes to support sustainability?",
+      "type": "detail",
+      "gold_paragraph_id": 4,
+      "gold_answer": "Paragraph 4."
+    }
+  ],
+
+  "passage_004": [
+    {
+      "id": "P4Q1",
+      "text": "Paragraph 1 states that economic inequality has widened because:",
+      "type": "detail",
+      "gold_paragraph_id": 1,
+      "gold_answer": "Globalization and technological innovation have concentrated wealth among a few, while wages stagnate."
+    },
+    {
+      "id": "P4Q2",
+      "text": "The word 'divergence' in Paragraph 1 most nearly means:",
+      "type": "vocab",
+      "gold_paragraph_id": 1,
+      "gold_vocab_definition": "A widening gap or growing difference."
+    },
+    {
+      "id": "P4Q3",
+      "text": "Which paragraph discusses how Nordic countries address inequality?",
+      "type": "detail",
+      "gold_paragraph_id": 2,
+      "gold_answer": "Paragraph 2."
+    },
+    {
+      "id": "P4Q4",
+      "text": "Based on Paragraph 3, why is it difficult for emerging economies to implement redistributive policies?",
+      "type": "detail",
+      "gold_paragraph_id": 3,
+      "gold_answer": "They have limited tax bases, informal labor markets, and political instability."
+    },
+    {
+      "id": "P4Q5",
+      "text": "Which global initiative aligns with the needs described in Paragraph 3?",
+      "type": "inference",
+      "gold_paragraph_id": 3,
+      "gold_inference_answer": "Transparency initiatives to curb offshore tax evasion and IMF technical assistance."
+    },
+    {
+      "id": "P4Q6",
+      "text": "Which paragraph emphasizes the role of multilateral institutions in reducing inequality?",
+      "type": "detail",
+      "gold_paragraph_id": 4,
+      "gold_answer": "Paragraph 4."
+    }
+  ],
+
+  "passage_005": [
+    {
+      "id": "P5Q1",
+      "text": "Paragraph 1 claims that cultural heritage faces extinction because:",
+      "type": "detail",
+      "gold_paragraph_id": 1,
+      "gold_answer": "Younger generations migrate to urban centers, and isolated traditions fade away."
+    },
+    {
+      "id": "P5Q2",
+      "text": "The word 'authenticity' in Paragraph 1 most nearly means:",
+      "type": "vocab",
+      "gold_paragraph_id": 1,
+      "gold_vocab_definition": "Genuineness; being true to origin without distortion."
+    },
+    {
+      "id": "P5Q3",
+      "text": "Which paragraph describes how VR and 3D scanning help preserve heritage?",
+      "type": "detail",
+      "gold_paragraph_id": 2,
+      "gold_answer": "Paragraph 2."
+    },
+    {
+      "id": "P5Q4",
+      "text": "Based on Paragraph 3, what is a major concern about digital archiving of sacred rituals?",
+      "type": "detail",
+      "gold_paragraph_id": 3,
+      "gold_answer": "Who has the right to digitize and how to protect sensitive knowledge."
+    },
+    {
+      "id": "P5Q5",
+      "text": "Which program would best foster intergenerational cultural transmission as suggested in Paragraph 4?",
+      "type": "inference",
+      "gold_paragraph_id": 4,
+      "gold_inference_answer": "Educational programs teaching youth digital storytelling and local knowledge systems."
+    },
+    {
+      "id": "P5Q6",
+      "text": "Which paragraph addresses concerns of ownership and control in digital archives?",
+      "type": "detail",
+      "gold_paragraph_id": 3,
+      "gold_answer": "Paragraph 3."
+    }
+  ]
+}

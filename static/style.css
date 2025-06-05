@@ -1,0 +1,20 @@
+/* static/style.css */
+
+h1, h2, h3 {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+}
+
+.stButton > button {
+  background-color: #1f77b4;
+  color: white;
+  border-radius: 4px;
+}
+
+.stAlert {
+  margin-top: 10px;
+}
+
+.streamlit-expanderHeader {
+  font-weight: bold;
+  color: #555;
+}
