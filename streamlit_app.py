@@ -1,4 +1,5 @@
 # app.py
+
 import os
 import json
 import tempfile
@@ -9,9 +10,9 @@ import openai
 from google.cloud import texttospeech
 
 # ---------------------------------------------------------
-# 1) Configuration & API Keys
+# 0) Page Styling
 # ---------------------------------------------------------
-# At top of app.py
+st.set_page_config(page_title="VARC Voice-Assistant MVP", layout="wide")
 st.markdown(
     """
     <link rel="stylesheet" href="static/style.css">
@@ -19,19 +20,23 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# OpenAI Whisper
-openai.api_key = os.getenv("OPENAI_API_KEY")  # Set this in your Streamlit secrets or env
+# ---------------------------------------------------------
+# 1) Bootstrap Secrets for Google TTS & OpenAI Whisper
+# ---------------------------------------------------------
+# Write GCP service account JSON (from st.secrets) to a temp file:
+sa_json = st.secrets["gcp_tts"]["service_account"]
+tts_sa_path = "/tmp/gcp_tts.json"
+with open(tts_sa_path, "w") as f:
+    f.write(sa_json)
+# Point Google client to that JSON:
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = tts_sa_path
 
-# Google TTS
-# Ensure GOOGLE_APPLICATION_CREDENTIALS is set to your GCP service account JSON:
-# export GOOGLE_APPLICATION_CREDENTIALS="/path/to/your/service-account.json"
+# Load OpenAI key from st.secrets and assign to openai.api_key:
+openai.api_key = st.secrets["openai"]["api_key"]
 
 # ---------------------------------------------------------
 # 2) Caching Models & Data Loading
 # ---------------------------------------------------------
-
-st.set_page_config(page_title="VARC Voice-Assistant MVP", layout="wide")
-
 @st.cache_resource(show_spinner=False)
 def load_nlp_model():
     return SentenceTransformer("all-MiniLM-L6-v2")
@@ -51,13 +56,14 @@ def load_data():
 passages, questions_data, paragraph_summaries = load_data()
 
 # ---------------------------------------------------------
-# 3) Utility Functions (repeated here for local use)
+# 3) Utility Functions
 # ---------------------------------------------------------
-
 def embed_texts(text_list):
     return nlp_model.encode(text_list, convert_to_tensor=True)
 
 def score_paraphrase(user_text, gold_text):
+    if not user_text or not gold_text:
+        return 0
     u_emb = nlp_model.encode(user_text, convert_to_tensor=True)
     g_emb = nlp_model.encode(gold_text, convert_to_tensor=True)
     sim = util.pytorch_cos_sim(u_emb, g_emb).item()
@@ -71,23 +77,22 @@ def score_paraphrase(user_text, gold_text):
 # ---------------------------------------------------------
 # 4) OpenAI Whisper ASR
 # ---------------------------------------------------------
-
 def transcribe_whisper(audio_bytes, model_name="whisper-1"):
     """
-    Uses OpenAI Whisper via their REST endpoint to transcribe audio.
-    audio_bytes: raw bytes of audio (WAV/MP3).
+    Uploads audio_bytes (WAV/MP3) to OpenAI Whisper and returns the transcript.
     """
     try:
-        # Save to a temporary file
+        # Save to a temporary file for Whisper
         with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
             tmp.write(audio_bytes)
             tmp.flush()
             tmp_path = tmp.name
 
         audio_file = open(tmp_path, "rb")
-        transcript = openai.Audio.transcribe(model_name, audio_file)
+        transcript = openai.Audio.transcribe(model=model_name, file=audio_file)
+        audio_file.close()
         os.remove(tmp_path)
-        return transcript["text"]
+        return transcript.get("text", "")
     except Exception as e:
         st.error(f"Whisper ASR Error: {e}")
         return ""
@@ -95,78 +100,72 @@ def transcribe_whisper(audio_bytes, model_name="whisper-1"):
 # ---------------------------------------------------------
 # 5) Google TTS
 # ---------------------------------------------------------
-
 @st.cache_resource(show_spinner=False)
 def get_tts_client():
     return texttospeech.TextToSpeechClient()
 
 def synthesize_text_to_mp3(text, voice_name="en-US-Wavenet-D", speaking_rate=1.0):
     """
-    text: the string to convert to speech
-    returns: raw bytes of MP3 audio
+    Converts text to MP3 bytes via Google TTS.
     """
     client = get_tts_client()
     input_text = texttospeech.SynthesisInput(text=text)
-    voice = texttospeech.VoiceSelectionParams(
-        language_code="en-US", name=voice_name
-    )
+    voice = texttospeech.VoiceSelectionParams(language_code="en-US", name=voice_name)
     audio_config = texttospeech.AudioConfig(
         audio_encoding=texttospeech.AudioEncoding.MP3,
         speaking_rate=speaking_rate,
     )
-    response = client.synthesize_speech(
-        input=input_text, voice=voice, audio_config=audio_config
-    )
-    return response.audio_content  # bytes of MP3
+    try:
+        response = client.synthesize_speech(input=input_text, voice=voice, audio_config=audio_config)
+        return response.audio_content
+    except Exception as e:
+        st.error(f"Google TTS Error: {e}")
+        return b""
 
 # ---------------------------------------------------------
-# 6) Streamlit Session State Initialization
+# 6) Initialize Session State
 # ---------------------------------------------------------
-
 if "user_data" not in st.session_state:
     st.session_state.user_data = {
-        "keyword_flags": {},  # {question_id: [keywords]}
-        "underlined_paragraph": None,  # int
-        "pivot_paragraphs": [],  # list of ints
+        "keyword_flags": {},            # {question_id: [keywords]}
+        "underlined_paragraph": None,    # selected paragraph number
+        "pivot_paragraphs": [],          # list of paragraph numbers flagged as pivot
         "paragraph_understandings": {},  # {para_num: text}
-        "question_paragraph_match": {},  # {question_id: int}
-        "inference_answers": {},  # {question_id: text}
-        "vocab_paraphrases": {},  # {question_id: text}
-        "question_paraphrases": {},  # {question_id: text}
-        "para_asr_text": {},    # {para_num: asr transcript}
+        "question_paragraph_match": {},  # {question_id: para_num}
+        "inference_answers": {},         # {question_id: text}
+        "vocab_paraphrases": {},         # {question_id: text}
+        "question_paraphrases": {},      # {question_id: text}
+        "para_asr_text": {},             # {para_num: asr transcript}
     }
 
 # ---------------------------------------------------------
 # 7) Streamlit UI
 # ---------------------------------------------------------
-
 st.title("📚 VARC Voice-Assistant MVP")
 st.markdown(
     """
 **Instructions (MVP):**  
 1. Select a passage.  
-2. Review all questions first → type any keywords you’d flag.  
-3. Read each paragraph (listen OR read) → click “Underline as Thesis” or “Flag as Pivot.”  
-4. For each paragraph, decide whether to speak your understanding (record) or type it.  
-5. For each question, select which paragraph it refers to.  
+2. Preview questions and type any keywords you’d flag.  
+3. Read/listen to each paragraph → click “Underline as Thesis” or “Flag as Pivot.”  
+4. For each paragraph, choose to speak your understanding (via file upload) or type it.  
+5. Match each question to a paragraph.  
 6. For inference/vocab questions, type your answer/paraphrase.  
-7. Paraphrase what each question is asking.  
-8. Submit to get a scoring summary.
+7. Paraphrase each question in your own words.  
+8. Submit to view a scoring summary.  
 """
 )
 
 # ---------------------------------------------------------
 # 8) Sidebar: TTS & ASR Settings
 # ---------------------------------------------------------
-
 st.sidebar.header("Settings")
 use_tts = st.sidebar.checkbox("Enable TTS Playback", value=True)
-use_asr = st.sidebar.checkbox("Enable Whisper ASR (Voice Recording)", value=False)
+use_asr = st.sidebar.checkbox("Enable Whisper ASR (Upload Audio)", value=False)
 
 # ---------------------------------------------------------
-# 9) Select Passage
+# 9) Step 0: Select Passage
 # ---------------------------------------------------------
-
 st.markdown("---")
 st.subheader("Step 0: Select a CAT VARC Passage")
 passage_keys = list(passages.keys())
@@ -180,7 +179,6 @@ st.markdown(f"**{selected_passage_key}: {selected_passage.get('title','')}**")
 # ---------------------------------------------------------
 # 10) Step 1: Preview Questions & Flag Keywords
 # ---------------------------------------------------------
-
 st.markdown("---")
 st.subheader("Step 1: Preview All Questions & Flag Keywords")
 
@@ -199,7 +197,6 @@ for q in selected_questions:
 # ---------------------------------------------------------
 # 11) Step 2: Read & Annotate Paragraphs
 # ---------------------------------------------------------
-
 st.markdown("---")
 st.subheader("Step 2: Read & Listen to Each Paragraph, Annotate & Explain Understanding")
 
@@ -220,11 +217,11 @@ for idx, para_text in selected_passage["paragraphs"].items():
         tts_bytes = synthesize_text_to_mp3(para_text)
         st.audio(tts_bytes, format="audio/mp3")
 
-    # Either record via Whisper or type
+    # Ask user to either upload audio for ASR or type their understanding
     if use_asr:
         st.markdown(f"**Record your verbal understanding of Paragraph {para_num}:**")
         audio_file = st.file_uploader(
-            f"Upload a short audio (WAV/MP3) for Para {para_num} understanding:",
+            f"Upload a short audio (WAV/MP3) for Para {para_num}:",
             type=["wav", "mp3"],
             key=f"audio_{para_num}"
         )
@@ -266,7 +263,6 @@ for idx, para_text in selected_passage["paragraphs"].items():
 # ---------------------------------------------------------
 # 12) Step 3: Paragraph Matching for Each Question
 # ---------------------------------------------------------
-
 st.markdown("---")
 st.subheader("Step 3: For Each Question, Match to a Paragraph")
 
@@ -283,7 +279,6 @@ for q in selected_questions:
 # ---------------------------------------------------------
 # 13) Step 4: Inference & Vocabulary Drills
 # ---------------------------------------------------------
-
 st.markdown("---")
 st.subheader("Step 4: Inference & Vocabulary Drills")
 
@@ -303,7 +298,6 @@ for q in selected_questions:
 # ---------------------------------------------------------
 # 14) Step 5: Paraphrase What Each Question Is Asking
 # ---------------------------------------------------------
-
 st.markdown("---")
 st.subheader("Step 5: Paraphrase What Each Question Is Asking")
 
@@ -316,9 +310,8 @@ for q in selected_questions:
 # ---------------------------------------------------------
 # 15) Step 6: Submit & Score Everything
 # ---------------------------------------------------------
-
 st.markdown("---")
-st.subheader("Step 6: Submit All and View Your Scores")
+st.subheader("Step 6: Submit All Answers & View Your Scores")
 
 if st.button("Submit All Answers"):
     ud = st.session_state.user_data
@@ -334,7 +327,7 @@ if st.button("Submit All Answers"):
 
     # 15.2 Inference Scores
     inf_scores = []
-    inf_questions = [qq for qq in selected_questions if qq["type"]=="inference"]
+    inf_questions = [qq for qq in selected_questions if qq["type"] == "inference"]
     if inf_questions:
         gold_infs = [qq["gold_inference_answer"] for qq in inf_questions]
         gold_inf_embs = nlp_model.encode(gold_infs, convert_to_tensor=True)
@@ -344,9 +337,9 @@ if st.button("Submit All Answers"):
             if ua:
                 ua_emb = nlp_model.encode(ua, convert_to_tensor=True)
                 sim = util.pytorch_cos_sim(ua_emb, gold_inf_embs[idx:idx+1]).item()
-                if sim>0.75:
+                if sim > 0.75:
                     inf_scores.append(10)
-                elif sim>0.5:
+                elif sim > 0.5:
                     inf_scores.append(5)
                 else:
                     inf_scores.append(0)
@@ -356,7 +349,7 @@ if st.button("Submit All Answers"):
 
     # 15.3 Vocabulary Scores
     vocab_scores = []
-    vocab_questions = [qq for qq in selected_questions if qq["type"]=="vocab"]
+    vocab_questions = [qq for qq in selected_questions if qq["type"] == "vocab"]
     if vocab_questions:
         gold_vocs = [qq["gold_vocab_definition"] for qq in vocab_questions]
         gold_voc_embs = nlp_model.encode(gold_vocs, convert_to_tensor=True)
@@ -366,9 +359,9 @@ if st.button("Submit All Answers"):
             if ua:
                 ua_emb = nlp_model.encode(ua, convert_to_tensor=True)
                 sim = util.pytorch_cos_sim(ua_emb, gold_voc_embs[idx:idx+1]).item()
-                if sim>0.75:
+                if sim > 0.75:
                     vocab_scores.append(10)
-                elif sim>0.5:
+                elif sim > 0.5:
                     vocab_scores.append(5)
                 else:
                     vocab_scores.append(0)
@@ -385,9 +378,9 @@ if st.button("Submit All Answers"):
             up_emb = nlp_model.encode(up, convert_to_tensor=True)
             gq_emb = nlp_model.encode(qq["text"], convert_to_tensor=True)
             sim = util.pytorch_cos_sim(up_emb, gq_emb).item()
-            if sim>0.7:
+            if sim > 0.7:
                 qp_scores.append(10)
-            elif sim>0.4:
+            elif sim > 0.4:
                 qp_scores.append(5)
             else:
                 qp_scores.append(0)
@@ -395,11 +388,11 @@ if st.button("Submit All Answers"):
             qp_scores.append(0)
     avg_qp = np.mean(qp_scores) if qp_scores else 0
 
-    # 15.5 Paragraph-Understanding Scores (either ASR or typed)
+    # 15.5 Paragraph-Understanding Scores
     pu_scores = []
     for idx, gs in selected_summaries.items():
         para_num = int(idx)
-        # prioritized ASR text
+        # Prioritize ASR text if present
         user_para_text = ud["para_asr_text"].get(para_num, ud["paragraph_understandings"].get(para_num, ""))
         if user_para_text:
             pu_scores.append(score_paraphrase(user_para_text, gs))
@@ -419,7 +412,7 @@ if st.button("Submit All Answers"):
             kw_scores.append(0)
     avg_kw = np.mean(kw_scores) if kw_scores else 0
 
-    # Display Summary
+    # Display Summary Table
     st.markdown("## 📝 Your Overall Scores")
     summary_table = {
         "Metric": [
@@ -431,12 +424,12 @@ if st.button("Submit All Answers"):
             "Keyword Flagging"
         ],
         "Score (0–10)": [
-            round(avg_pm,1),
-            round(avg_inf,1),
-            round(avg_vocab,1),
-            round(avg_qp,1),
-            round(avg_pu,1),
-            round(avg_kw,1)
+            round(avg_pm, 1),
+            round(avg_inf, 1),
+            round(avg_vocab, 1),
+            round(avg_qp, 1),
+            round(avg_pu, 1),
+            round(avg_kw, 1)
         ]
     }
     st.table(summary_table)
